@@ -7,13 +7,18 @@ metadata:
   name: {{ $name }}
   namespace: services
   annotations:
-    policies.kyverno.io/title: Mutate pod and container security contexts
+    policies.kyverno.io/title: Require runAsNonRoot, disallow Privilege Escalation and Privileged Containers
     policies.kyverno.io/category: Pod Security Standards (Baseline)
+    {{- if .Values.podSecuritySeverity }}
+    policies.kyverno.io/severity: {{ .Values.podSecuritySeverity }}
+    {{- end }}
     kyverno.io/kyverno-version: 1.6.0
-    policies.kyverno.io/minversion: 1.6.0
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
-      Highly restrictive mutate policy setting container security context
+      Containers must be required to run as non-root users. Privilege escalation, such as via set-user-ID
+      or set-group-ID file mode, should not be allowed. Privileged mode disables most security mechanisms
+      and must not be allowed. This policy ensures `runAsNonRoot` is set to `true`, `allowPrivilegeEscalation`
+      field is set to `false` and pods do not call for privileged mode.
 spec:
   background: true
   validationFailureAction: audit
@@ -28,13 +33,16 @@ spec:
             app.kubernetes.io/instance: cray-hms-bss
             app.kubernetes.io/name: cray-bss
     validate:
-      message: "Non root security context is not set."
+      message: >-
+        Running as root is not allowed, Privilege escalation is disallowed and Privileged mode is disallowed. The fields
+        spec.containers[*].securityContext.runAsNonRoot must be set to `true`, spec.containers[*].securityContext.allowPrivilegeEscalation
+        must be set to `false` and spec.containers[*].securityContext.privileged must be unset or set to `false`.
       pattern:
         spec:
           containers:
           - (name): "*"
             securityContext:
+              runAsNonRoot: true
               allowPrivilegeEscalation: false
               privileged: false
-              runAsNonRoot: true
 {{- end }}

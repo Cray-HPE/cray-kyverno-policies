@@ -1,4 +1,3 @@
-
 {{- $name := "pod-sec-ctxt-customer-management-ingress" }}
 {{- if eq (include "kyverno-policy.podSecurityBaseline" (merge (dict "name" $name) .)) "true" }}
 {{- include "kyverno-policy.supportedKyvernoCheck" (dict "top" . "ver" ">= 1.6.0-0") }}
@@ -8,13 +7,19 @@ metadata:
   name: {{ $name }}
   namespace: services 
   annotations:
-    policies.kyverno.io/title: Mutate pod and container security contexts
+    policies.kyverno.io/title: Require runAsNonRoot, run As Non-Root User, disallow Privilege Escalation and Privileged Containers
     policies.kyverno.io/category: Pod Security Standards (Baseline)
+    {{- if .Values.podSecuritySeverity }}
+    policies.kyverno.io/severity: {{ .Values.podSecuritySeverity }}
+    {{- end }}
     kyverno.io/kyverno-version: 1.6.0
-    policies.kyverno.io/minversion: 1.6.0
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
-      Highly restrictive mutate policy setting container security context
+      Containers must be required to run as non-root users. Privilege escalation, such as via set-user-ID
+      or set-group-ID file mode, should not be allowed. Privileged mode disables most security mechanisms
+      and must not be allowed. This policy ensures `runAsNonRoot` is set to `true`, `runAsUser` is either
+      unset or set to a number greater than zero, `allowPrivilegeEscalation` field is set to `false` and
+      pods do not call for privileged mode.
 spec:
   rules:
   - name: set-container-security-context
@@ -35,9 +40,7 @@ spec:
                 {{`{{element.name}}`}}
               securityContext:
                 +(runAsUser): 2000
-                +(runAsGroup): 0
-                +(runAsNonRoot): true
-                +(privileged): false
-                +(allowPrivilegeEscalation): false
+                runAsNonRoot: true
+                allowPrivilegeEscalation: false
+                privileged: false
 {{- end }}
-
