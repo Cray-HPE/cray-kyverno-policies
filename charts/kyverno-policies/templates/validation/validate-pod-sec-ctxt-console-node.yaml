@@ -1,5 +1,4 @@
 {{- $name := "validate-pod-sec-ctxt-console-node" }}
-{{- if eq (include "kyverno-policy.podSecurityBaseline" (merge (dict "name" $name) .)) "true" }}
 {{- include "kyverno-policy.supportedKyvernoCheck" (dict "top" . "ver" ">= 1.6.0-0") }}
 apiVersion: kyverno.io/v1
 kind: Policy
@@ -8,10 +7,6 @@ metadata:
   namespace: services
   annotations:
     policies.kyverno.io/title: Require runAsNonRoot, disallow Privilege Escalation and Privileged Containers
-    policies.kyverno.io/category: Pod Security Standards (Baseline)
-    {{- if .Values.podSecuritySeverity }}
-    policies.kyverno.io/severity: {{ .Values.podSecuritySeverity }}
-    {{- end }}
     kyverno.io/kyverno-version: 1.6.0
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
@@ -45,4 +40,3 @@ spec:
               runAsNonRoot: true
               allowPrivilegeEscalation: false
               privileged: false
-{{- end }}
