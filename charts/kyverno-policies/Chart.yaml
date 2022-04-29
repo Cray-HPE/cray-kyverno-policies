@@ -8,5 +8,8 @@ keywords:
   - policy agent
   - validating webhook
   - admissions controller
+maintainers:
+  - name: sriramss
+    url: https://kyverno.io/
 engine: gotpl
 kubeVersion: ">=1.16.0-0"
