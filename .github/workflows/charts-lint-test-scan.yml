@@ -25,7 +25,7 @@ name: Lint, test, and scan Helm charts
 on:
   pull_request:
     branches:
-      - master
+      - main
       - release/**
   schedule:
     - cron: "19 19 * * *"
