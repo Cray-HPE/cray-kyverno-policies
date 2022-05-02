@@ -10,6 +10,6 @@ keywords:
   - admissions controller
 maintainers:
   - name: sriramss
-    url: https://kyverno.io/
+    url: https://github.com/Cray-HPE/cray-kyverno-policies
 engine: gotpl
 kubeVersion: ">=1.16.0-0"
