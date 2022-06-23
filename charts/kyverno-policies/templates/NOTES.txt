@@ -1,0 +1,5 @@
+Thank you for installing {{ .Chart.Name }} {{ .Chart.Version }} 😀
+
+We have installed the collection of policies that implement the various levels of Kubernetes Pod Security Standards.
+
+Visit https://kyverno.io/policies/ to find more sample policies.

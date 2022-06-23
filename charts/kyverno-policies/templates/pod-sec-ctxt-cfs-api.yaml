@@ -1,0 +1,39 @@
+{{- $name := "pod-sec-ctxt-cfs-api" }}
+{{- include "kyverno-policy.supportedKyvernoCheck" (dict "top" . "ver" ">= 1.6.0-0") }}
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: {{ $name }}
+  namespace: services
+  annotations:
+    policies.kyverno.io/title: Require runAsNonRoot, disallow Privilege Escalation and Privileged Containers
+    kyverno.io/kyverno-version: 1.6.0
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Containers must be required to run as non-root users. Privilege escalation, such as via set-user-ID
+      or set-group-ID file mode, should not be allowed. Privileged mode disables most security mechanisms
+      and must not be allowed. This policy ensures `runAsNonRoot` is set to `true`,
+      `allowPrivilegeEscalation` field is set to `false` and pods do not call for privileged mode.
+spec:
+  rules:
+  - name: set-container-security-context
+    match:
+      resources:
+        kinds:
+        - Pod
+        selector:
+          matchLabels:
+            app.kubernetes.io/instance: cray-cfs-api
+            app.kubernetes.io/name: cray-cfs-api
+    mutate:
+      foreach:
+      - list: "request.object.spec.containers"
+        patchStrategicMerge:
+          spec:
+            containers:
+            - (name): |-
+                {{`{{element.name}}`}}
+              securityContext:
+                runAsNonRoot: true
+                allowPrivilegeEscalation: false
+                privileged: false
