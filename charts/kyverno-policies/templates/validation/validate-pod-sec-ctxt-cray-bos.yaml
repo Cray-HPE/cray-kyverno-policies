@@ -26,7 +26,6 @@ spec:
         selector:
           matchLabels:
             app.kubernetes.io/instance: cray-bos
-            app.kubernetes.io/name: cray-bos
     validate:
       message: >-
         Running as root is not allowed, Privilege escalation is disallowed and Privileged mode is disallowed. The fields

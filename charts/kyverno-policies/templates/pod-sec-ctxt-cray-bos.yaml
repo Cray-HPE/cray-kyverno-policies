@@ -24,7 +24,6 @@ spec:
         selector:
           matchLabels:
             app.kubernetes.io/instance: cray-bos
-            app.kubernetes.io/name: cray-bos
     mutate:
       foreach:
       - list: "request.object.spec.containers"
