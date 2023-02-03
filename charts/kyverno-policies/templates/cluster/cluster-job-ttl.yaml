@@ -1,0 +1,41 @@
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  annotations:
+    policies.kyverno.io/title: Set default TTL on Jobs that haven't specified it
+    policies.kyverno.io/category: Workarounds
+    policies.kyverno.io/description: >-
+      Ensure all completed and errored jobs do not remain in containerd with a
+      maximum age time to live.
+  name: cluster-job-ttl
+spec:
+  rules:
+    - name: cluster-job-ttl
+      match:
+        resources:
+          kinds:
+            - "Job"
+      preconditions:
+        any:
+          # Note this string/key looks odd but the "real" string "should" be this(ish):
+          # key: "LCURLYLCURLY request..... || '' RCURLYRCURLY"
+          #
+          # Note also I can't include curlies in comments so LCURLY={ RCURLY=}
+          #
+          # But helm tries to render that go template itself even though we want
+          # kyverno to do that, and this is the *only* way I could find that
+          # resulted in a working helm template that worked with kyverno after
+          # installed onto a cluster. Note that we end up with || '''' not || '' at the end and
+          # while its lamentable its not "right" it works to set job ttl
+          # defaults.
+          - key: "{{`{{ request.object.metadata.ownerReferences || '' }}`}}"
+            operator: Equals
+            value: ''
+      mutate:
+        patchStrategicMerge:
+          spec:
+            # = 3 days (3 * 24 * 60 * 60) max default ttl if not specified by
+            # the Job at submission time. Any Job specifying the ttl in its
+            # spec will not be affected.
+            +(ttlSecondsAfterFinished): 259200
