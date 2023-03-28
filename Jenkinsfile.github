@@ -36,7 +36,7 @@ pipeline {
     }
 
     environment {
-        NAME = "cray-kyverno-policies"
+        NAME = "cray-kyverno-policy"
         DESCRIPTION = "Deploys kyverno policies for Cray system."
         IS_STABLE = getBuildIsStable()
     }
@@ -45,7 +45,7 @@ pipeline {
         stage("Build") {
             environment {
                 CHART_VERSIONS = [
-                    getChartVersion(name: "kyverno-policies", chartDirectory: "charts", isStable: env.IS_STABLE)
+                    getChartVersion(name: "kyverno-policy", chartDirectory: "charts", isStable: env.IS_STABLE)
                 ].join(" ")
             }
             steps {

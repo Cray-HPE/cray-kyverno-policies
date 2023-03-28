@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright [2022] Hewlett Packard Enterprise Development LP
+# (C) Copyright {{cookiecutter.year}} Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -21,67 +21,86 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 #
+NAME ?= kyverno-policy
+VERSION ?= $(shell cat .version)
+
+CHART_VERSION ?= $(VERSION)
+IMAGE ?= artifactory.algol60.net/csm-docker/stable/${NAME}
+
+CHARTDIR ?= charts
+
 CHART_METADATA_IMAGE ?= artifactory.algol60.net/csm-docker/stable/chart-metadata
 YQ_IMAGE ?= artifactory.algol60.net/docker.io/mikefarah/yq:4
 HELM_IMAGE ?= artifactory.algol60.net/docker.io/alpine/helm:3.7.1
-HELM_UNITTEST_IMAGE ?= artifactory.algol60.net/docker.io/quintush/helm-unittest:latest
+HELM_UNITTEST_IMAGE ?= artifactory.algol60.net/docker.io/quintush/helm-unittest
 HELM_DOCS_IMAGE ?= artifactory.algol60.net/docker.io/jnorwood/helm-docs:v1.5.0
+ifeq ($(shell uname -s),Darwin)
+	HELM_CONFIG_HOME ?= $(HOME)/Library/Preferences/helm
+else
+	HELM_CONFIG_HOME ?= $(HOME)/.config/helm
+endif
+COMMA := ,
 
-all: lint dep-up test package
+all : image chart
+
+image:
+	docker build --no-cache --pull ${DOCKER_ARGS} --tag '${NAME}:${VERSION}' .
+
+chart: chart-metadata chart-package chart-test
+
+chart-metadata:
+	docker run --rm \
+		--user $(shell id -u):$(shell id -g) \
+		-v ${PWD}/${CHARTDIR}/${NAME}:/chart \
+		${CHART_METADATA_IMAGE} \
+		--version "${CHART_VERSION}" --app-version "${VERSION}" \
+		-i ${NAME} ${IMAGE}:${VERSION} \
+		--cray-service-globals
+	docker run --rm \
+		--user $(shell id -u):$(shell id -g) \
+		-v ${PWD}/${CHARTDIR}/${NAME}:/chart \
+		-w /chart \
+		${YQ_IMAGE} \
+		eval -Pi '.cray-service.containers.${NAME}.image.repository = "${IMAGE}"' values.yaml
 
 helm:
 	docker run --rm \
-		--user $(shell id -u):$(shell id -g) \
-		--mount type=bind,src="$(shell pwd)",dst=/src \
-		-w /src \
-		-e HELM_CACHE_HOME=/src/.helm/cache \
-		-e HELM_CONFIG_HOME=/src/.helm/config \
-		-e HELM_DATA_HOME=/src/.helm/data \
-		$(HELM_IMAGE) \
-		$(CMD)
+	    --user $(shell id -u):$(shell id -g) \
+	    --mount type=bind,src="$(shell pwd)",dst=/src \
+	    $(if $(wildcard $(HELM_CONFIG_HOME)/.),--mount type=bind$(COMMA)src=$(HELM_CONFIG_HOME)$(COMMA)dst=/tmp/.helm/config) \
+	    -w /src \
+	    -e HELM_CACHE_HOME=/src/.helm/cache \
+	    -e HELM_CONFIG_HOME=/tmp/.helm/config \
+	    -e HELM_DATA_HOME=/src/.helm/data \
+	    $(HELM_IMAGE) \
+	    $(CMD)
 
-lint:
-	CMD="lint charts/kyverno-policies" $(MAKE) helm
+chart-package: packages/${NAME}-${CHART_VERSION}.tgz
 
-dep-up:
-	CMD="dep up charts/kyverno-policies" $(MAKE) helm
+packages/${NAME}-${CHART_VERSION}.tgz:
+	CMD="dep up ${CHARTDIR}/${NAME}" $(MAKE) helm
+	CMD="package ${CHARTDIR}/${NAME} -d packages" $(MAKE) helm
 
-test:
-	docker run --rm \
-		-v ${PWD}/charts:/apps \
-		${HELM_UNITTEST_IMAGE} \
-		kyverno-policies
+chart-test:
+	CMD="lint ${CHARTDIR}/${NAME}" $(MAKE) helm
+	docker run --rm -v ${PWD}/${CHARTDIR}:/apps ${HELM_UNITTEST_IMAGE} -3 ${NAME}
 
-package:
-ifdef CHART_VERSIONS
-	CMD="package charts/kyverno-policies --version $(word 1, $(CHART_VERSIONS)) -d packages" $(MAKE) helm
-else
-	CMD="package charts/* -d packages" $(MAKE) helm
-endif
-
-extracted-images:
-	CMD="template release $(CHART) --dry-run --replace --dependency-update" $(MAKE) -s helm \
-	| docker run --rm -i $(YQ_IMAGE) e -N '.. | .image? | select(.)' -
-
-annotated-images:
-	CMD="show chart $(CHART)" $(MAKE) -s helm \
-	| docker run --rm -i $(YQ_IMAGE) e -N '.annotations."artifacthub.io/images"' - \
-	| docker run --rm -i $(YQ_IMAGE) e -N '.. | .image? | select(.)' -
-
-images:
-	{ CHART=charts/kyverno-policies $(MAKE) -s extracted-images annotated-images; \
-	} | sort -u
+chart-images: packages/${NAME}-${CHART_VERSION}.tgz
+	{ CMD="template release $< --dry-run --replace --dependency-update" $(MAKE) -s helm; \
+	  echo '---' ; \
+	  CMD="show chart $<" $(MAKE) -s helm | docker run --rm -i $(YQ_IMAGE) e -N '.annotations."artifacthub.io/images"' - ; \
+	} | docker run --rm -i $(YQ_IMAGE) e -N '.. | .image? | select(.)' - | sort -u
 
 snyk:
-	$(MAKE) -s images | xargs --verbose -n 1 snyk container test
+	$(MAKE) -s chart-images | xargs --verbose -n 1 snyk container test
 
-gen-docs:
+chart-gen-docs:
 	docker run --rm \
-		--user $(shell id -u):$(shell id -g) \
-		--mount type=bind,src="$(shell pwd)",dst=/src \
-		-w /src \
-		$(HELM_DOCS_IMAGE) \
-		helm-docs --chart-search-root=charts
+	    --user $(shell id -u):$(shell id -g) \
+	    --mount type=bind,src="$(shell pwd)",dst=/src \
+	    -w /src \
+	    $(HELM_DOCS_IMAGE) \
+	    helm-docs --chart-search-root=$(CHARTDIR)
 
 clean:
-	$(RM) -r .helm packages charts/kyverno-policies/charts
+	$(RM) -r .helm packages
