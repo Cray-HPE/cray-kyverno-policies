@@ -42,22 +42,7 @@ COMMA := ,
 
 all: chart
 
-chart: chart-metadata chart-package chart-test
-
-chart-metadata:
-	docker run --rm \
-		--user $(shell id -u):$(shell id -g) \
-		-v ${PWD}/${CHARTDIR}/${NAME}:/chart \
-		${CHART_METADATA_IMAGE} \
-		--version "${CHART_VERSION}" --app-version "${VERSION}" \
-		-i ${NAME} ${IMAGE}:${VERSION} \
-		--cray-service-globals
-	docker run --rm \
-		--user $(shell id -u):$(shell id -g) \
-		-v ${PWD}/${CHARTDIR}/${NAME}:/chart \
-		-w /chart \
-		${YQ_IMAGE} \
-		eval -Pi '.cray-service.containers.${NAME}.image.repository = "${IMAGE}"' values.yaml
+chart: chart-package chart-test
 
 helm:
 	docker run --rm \
@@ -80,13 +65,7 @@ packages/${NAME}-${CHART_VERSION}.tgz:
 chart-test:
 	CMD="lint ${CHARTDIR}/${NAME}" $(MAKE) helm
 	docker run --rm -v ${PWD}/${CHARTDIR}:/apps ${HELM_UNITTEST_IMAGE} ${NAME}
-
-chart-images: packages/${NAME}-${CHART_VERSION}.tgz
-	{ CMD="template release $< --dry-run --replace --dependency-update" $(MAKE) -s helm; \
-	  echo '---' ; \
-	  CMD="show chart $<" $(MAKE) -s helm | docker run --rm -i $(YQ_IMAGE) e -N '.annotations."artifacthub.io/images"' - ; \
-	} | docker run --rm -i $(YQ_IMAGE) e -N '.. | .image? | select(.)' - | sort -u
-
+	
 snyk:
 	$(MAKE) -s chart-images | xargs --verbose -n 1 snyk container test
 
