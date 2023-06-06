@@ -12,6 +12,11 @@ metadata:
 spec:
   rules:
     - name: cluster-job-ttl
+      exclude:
+        all:
+        - resources:
+            names:
+            - "*-wait-for-*"
       match:
         resources:
           kinds:
