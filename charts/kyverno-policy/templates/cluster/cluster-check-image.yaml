@@ -1,0 +1,36 @@
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  annotations:
+    policies.kyverno.io/title: Verify Cosign image signatures against provided public key
+    policies.kyverno.io/description: >-
+      Verify Cosign image signatures against provided public key.
+  name: check-image
+spec:
+  validationFailureAction: {{ .Values.checkImagePolicy.validationFailureAction }}
+  background: {{ .Values.checkImagePolicy.background }}
+  webhookTimeoutSeconds: {{ .Values.checkImagePolicy.webhookTimeoutSeconds }}
+  failurePolicy: {{ .Values.checkImagePolicy.failurePolicy }}
+  rules:
+  - name: check-image
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    verifyImages:
+    - imageReferences:
+{{ .Values.checkImagePolicy.imageReferences | toYaml | indent 6 }}
+      repository: {{ .Values.checkImagePolicy.repository }}
+      mutateDigest: {{ .Values.checkImagePolicy.mutateDigest }}
+      verifyDigest: {{ .Values.checkImagePolicy.verifyDigest }}
+      attestors:
+{{- range .Values.checkImagePolicy.publicKeys }}
+      - count: 1
+        entries:
+        - keys:
+            publicKeys: |-
+{{ . | indent 14 }}
+            signatureAlgorithm: sha256
+{{- end }}
