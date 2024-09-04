@@ -1,3 +1,8 @@
+{{- $keys := .Values.checkImagePolicy.publicKeys }}
+{{- $secret := (lookup "v1" "Secret" .Release.Namespace .Values.k8sSecretName) }}
+{{- if $secret }}
+{{- $keys = $secret.data }}
+{{- end }}
 ---
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
@@ -5,7 +10,9 @@ metadata:
   annotations:
     policies.kyverno.io/title: Verify Cosign image signatures against provided public key
     policies.kyverno.io/description: >-
-      Verify Cosign image signatures against provided public key.
+      Verify Cosign image signatures against provided public key(s).
+    kyverno.io/kyverno-version: 1.6.0
+    policies.kyverno.io/subject: Pod
   name: check-image
 spec:
   validationFailureAction: {{ .Values.checkImagePolicy.validationFailureAction }}
@@ -18,19 +25,26 @@ spec:
       any:
       - resources:
           kinds:
-          - Pod
+            - Pod
+          namespaces:
+            - "*"
+    exclude:
+      any:
+        - resources:
+            namespaces:
+              - sample-ns
+            names:
+              - "sample-name"
     verifyImages:
     - imageReferences:
 {{ .Values.checkImagePolicy.imageReferences | toYaml | indent 6 }}
-      repository: {{ .Values.checkImagePolicy.repository }}
       mutateDigest: {{ .Values.checkImagePolicy.mutateDigest }}
       verifyDigest: {{ .Values.checkImagePolicy.verifyDigest }}
       attestors:
-{{- range .Values.checkImagePolicy.publicKeys }}
       - count: 1
         entries:
         - keys:
             publicKeys: |-
-{{ . | indent 14 }}
-            signatureAlgorithm: sha256
+{{- range $name, $key := $keys }}
+{{ $key | b64dec | trim | indent 14 }}
 {{- end }}

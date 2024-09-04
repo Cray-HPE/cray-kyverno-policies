@@ -3,10 +3,11 @@ checkImagePolicy:
   validationFailureAction: Audit
   background: true
   webhookTimeoutSeconds: 30
-  failurePolicy: Ignore
+  failurePolicy: Fail
   repository: registry.local
   mutateDigest: false
   verifyDigest: false
   imageReferences:
   - "*"
   publicKeys: []
+k8sSecretName: "hpe-oci-signing-key"
