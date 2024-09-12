@@ -9,5 +9,17 @@ checkImagePolicy:
   verifyDigest: false
   imageReferences:
   - "*"
-  publicKeys: []
+  skipImageReferences:
+  - dtr.dev.cray.com/baseos/busybox:1.31.1
+  - dtr.dev.cray.com/hashicorp/vault:1.16.1
+  - dtr.dev.cray.com/library/mariadb:10.11.7
+  - dtr.dev.cray.com/cray/cray-slurmctld:*
+  - dtr.dev.cray.com/cray/cray-slurmdbd:*
+  - dtr.dev.cray.com/cray/cray-pbs:*
+  publicKeys:
+    curl: |
+      -----BEGIN PUBLIC KEY-----
+      MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEwFTRXl79xRiAFa5ZX4aZ7Vkdqmji
+      5WY0zqc3bd6B08CsNftlYsu2gAqdWm0IlzoQpi2Zi5C437RTg/DgLQ6Bkg==
+      -----END PUBLIC KEY-----
 k8sSecretName: "hpe-oci-signing-key"

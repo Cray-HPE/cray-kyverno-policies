@@ -1,8 +1,4 @@
-{{- $keys := .Values.checkImagePolicy.publicKeys }}
 {{- $secret := (lookup "v1" "Secret" .Release.Namespace .Values.k8sSecretName) }}
-{{- if $secret }}
-{{- $keys = $secret.data }}
-{{- end }}
 ---
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
@@ -38,6 +34,8 @@ spec:
     verifyImages:
     - imageReferences:
 {{ .Values.checkImagePolicy.imageReferences | toYaml | indent 6 }}
+      skipImageReferences:
+{{ .Values.checkImagePolicy.skipImageReferences | toYaml | indent 6 }}
       mutateDigest: {{ .Values.checkImagePolicy.mutateDigest }}
       verifyDigest: {{ .Values.checkImagePolicy.verifyDigest }}
       attestors:
@@ -45,6 +43,11 @@ spec:
         entries:
         - keys:
             publicKeys: |-
-{{- range $name, $key := $keys }}
+{{- if $secret }}
+{{- range $name, $key := $secret.data }}
 {{ $key | b64dec | trim | indent 14 }}
+{{- end }}
+{{- end }}
+{{- range $name, $key := .Values.checkImagePolicy.publicKeys }}
+{{ $key | trim | indent 14 }}
 {{- end }}
