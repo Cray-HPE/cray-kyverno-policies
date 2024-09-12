@@ -33,8 +33,12 @@ spec:
         - resources:
             namespaces:
               - sample-ns
+              - services
             names:
               - "sample-name"
+              - "cray-cps*"
+              - "cos-config-service*"
+              - "nmdv2-service*"
     verifyImages:
     - imageReferences:
 {{ .Values.checkImagePolicy.imageReferences | toYaml | indent 6 }}
