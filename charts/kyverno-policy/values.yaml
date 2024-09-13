@@ -9,13 +9,26 @@ checkImagePolicy:
   verifyDigest: false
   imageReferences:
   - "*"
-  skipImageReferences:
-  - dtr.dev.cray.com/baseos/busybox:1.31.1
-  - dtr.dev.cray.com/hashicorp/vault:1.16.1
-  - dtr.dev.cray.com/library/mariadb:10.11.7
-  - dtr.dev.cray.com/cray/cray-slurmctld:*
-  - dtr.dev.cray.com/cray/cray-slurmdbd:*
-  - dtr.dev.cray.com/cray/cray-pbs:*
+  exclude:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        namespaces:
+        - user
+        names:
+        - pbs-*
+        - slurm-backup
+        - slurmctld-*
+        - slurmdb-*
+        - slurmdbd-*
+    - resources:
+        kinds:
+        - Pod
+        namespaces:
+        - services
+        names:
+        - munge-vault-loader-*
   publicKeys:
     curl: |
       -----BEGIN PUBLIC KEY-----

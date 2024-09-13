@@ -25,17 +25,10 @@ spec:
           namespaces:
             - "*"
     exclude:
-      any:
-        - resources:
-            namespaces:
-              - sample-ns
-            names:
-              - "sample-name"
+{{ .Values.checkImagePolicy.exclude | toYaml | indent 6 }}
     verifyImages:
     - imageReferences:
 {{ .Values.checkImagePolicy.imageReferences | toYaml | indent 6 }}
-      skipImageReferences:
-{{ .Values.checkImagePolicy.skipImageReferences | toYaml | indent 6 }}
       mutateDigest: {{ .Values.checkImagePolicy.mutateDigest }}
       verifyDigest: {{ .Values.checkImagePolicy.verifyDigest }}
       attestors:
