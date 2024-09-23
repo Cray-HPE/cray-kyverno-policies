@@ -1,0 +1,90 @@
+# Based on: https://kyverno.io/policies/other/prepend-image-registry/prepend-image-registry/
+apiVersion : kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: prepend-registry
+  annotations:
+    policies.kyverno.io/title: Prepend Image Registry
+    policies.kyverno.io/category: Other
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/minversion: 1.6.0
+    kyverno.io/kyverno-version: 1.6.0
+    kyverno.io/kubernetes-version: "1.21"
+    policies.kyverno.io/description: >-
+      For CSM deployment, mirroring configuration is set into containerd via /etc/containerd/config.toml file.
+      In particular, this comfiguration rewrites images such as artifactory.algol60.net/csm-docker/name:tag
+      to be looked at in a registry named "registry.local" (i.e. instance of Nexus running locally in Kubernetes cluster).
+      This approach is not compatible with Kyverno check-image policy, which verifies image signatures. This policy
+      performs the same action (i.e. prepends "registry.local/" to image name), in a way compatible with Kyverno
+      check-image policy. Note: registry.local starts responding only after Nexus is deployed into Kubernetes cluster.
+      This policy can be deployed only when Nexus is already deployed and populated with content.
+spec:
+  background: false
+  rules:
+  - name: prepend-registry-containers
+    exclude:
+      any:
+      - resources:
+          kinds:
+          - DaemonSet
+          - Deployment
+          - Job
+          - StatefulSet
+          - ReplicaSet
+          - ReplicationController
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    preconditions:
+      all:
+      - key: "{{ "{{" }} request.operation || 'BACKGROUND' {{ "}}" }}"
+        operator: AnyIn
+        value:
+        - CREATE
+        - UPDATE
+    mutate:
+      foreach:
+      - list: "request.object.spec.containers"
+        patchStrategicMerge:
+          spec:
+            containers:
+            - name: "{{ "{{" }} element.name {{ "}}" }}"
+              image: |-
+                {{ "{{" }} images.containers."{{ "{{" }} element.name {{ "}}" }}".registry != 'registry.local' && 'registry.local/' || '' {{ "}}" }}{{ "{{" }} images.containers."{{ "{{" }} element.name {{ "}}" }}".registry {{ "}}" }}/{{ "{{" }} images.containers."{{ "{{" }} element.name {{ "}}" }}".path {{ "}}" }}:{{ "{{" }} images.containers."{{ "{{" }} element.name {{ "}}" }}".tag {{ "}}" }}
+  - name: prepend-registry-initcontainers
+    exclude:
+      any:
+      - resources:
+          kinds:
+          - DaemonSet
+          - Deployment
+          - Job
+          - StatefulSet
+          - ReplicaSet
+          - ReplicationController
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    preconditions:
+      all:
+      - key: "{{ "{{" }} request.operation || 'BACKGROUND' {{ "}}" }}"
+        operator: AnyIn
+        value:
+        - CREATE
+        - UPDATE
+      - key: "{{ "{{" }} request.object.spec.initContainers[] || '' | length(@) {{ "}}" }}"
+        operator: GreaterThanOrEquals
+        value: 1
+    mutate:
+      foreach:
+      - list: "request.object.spec.initContainers"
+        patchStrategicMerge:
+          spec:
+            initContainers:
+            - name: "{{ "{{" }} element.name {{ "}}" }}"
+              image: |-
+                {{ "{{" }} images.initContainers."{{ "{{" }} element.name {{ "}}" }}".registry != 'registry.local' && 'registry.local/' || '' {{ "}}" }}{{ "{{" }} images.initContainers."{{ "{{" }} element.name {{ "}}" }}".registry {{ "}}" }}/{{ "{{" }} images.initContainers."{{ "{{" }} element.name {{ "}}" }}".path {{ "}}" }}:{{ "{{" }} images.initContainers."{{ "{{" }} element.name {{ "}}" }}".tag {{ "}}" }}
