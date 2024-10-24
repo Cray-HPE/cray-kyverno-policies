@@ -37,7 +37,9 @@ jobs:
       lint-charts: ${{ github.event_name == 'pull_request' }}
       test-charts: false
       scan-chart-snyk-args: "--severity-threshold=high --policy-path=charts/.snyk"
-      scan-image-snyk-args: "--severity-threshold=high"
+      # This chart contains no images. Attempt to scan images fails, because prepend-registry policy
+      # has "image:" field mistakenly recognized as container image spec in helm template.
+      scan-images: false
     secrets:
       snyk-token: ${{ secrets.SNYK_TOKEN }}
       github-token: ${{ secrets.GITHUB_TOKEN }}
