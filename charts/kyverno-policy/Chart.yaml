@@ -1,15 +1,16 @@
 apiVersion: v1
 name: kyverno-policy
-version: 1.6.1
-appVersion: v1.6.1
+version: 1.7.1
+appVersion: v1.13.4
 description: Kubernetes Pod Security Standards implemented as Kyverno policies
 keywords:
   - kubernetes
   - policy agent
   - validating webhook
   - admissions controller
+home: https://github.com/Cray-HPE/cray-kyverno-policies
 maintainers:
-  - name: sriramss
-    url: https://github.com/Cray-HPE/cray-kyverno-policies
+  - name: csm-security-team
+    email: security_blr@hpe.com
 engine: gotpl
-kubeVersion: ">=1.16.0-0"
+kubeVersion: ">=1.25.0-0"

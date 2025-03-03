@@ -16,7 +16,7 @@ metadata:
       field is set to `false` and pods do not call for privileged mode.
 spec:
   background: true
-  validationFailureAction: audit
+  validationFailureAction: Audit
   rules:
   - name: container-security-context
     match:
