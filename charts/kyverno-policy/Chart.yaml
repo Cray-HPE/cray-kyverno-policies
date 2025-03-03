@@ -10,7 +10,7 @@ keywords:
   - admissions controller
 home: https://github.com/Cray-HPE/cray-kyverno-policies
 maintainers:
-  - name: csm-security-team
+  - name: Cray-HPE
     email: security_blr@hpe.com
 engine: gotpl
 kubeVersion: ">=1.25.0-0"
