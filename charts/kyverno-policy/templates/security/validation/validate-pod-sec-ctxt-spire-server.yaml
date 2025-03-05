@@ -4,7 +4,7 @@ apiVersion: kyverno.io/v1
 kind: Policy
 metadata:
   name: {{ $name }}
-  namespace: spire 
+  namespace: spire
   annotations:
     policies.kyverno.io/title: Require runAsNonRoot, disallow Privilege Escalation and Privileged Containers
     kyverno.io/kyverno-version: 1.6.0
@@ -16,7 +16,7 @@ metadata:
       field is set to `false` and pods do not call for privileged mode.
 spec:
   background: true
-  validationFailureAction: audit
+  validationFailureAction: Audit
   rules:
   - name: container-security-context
     match:

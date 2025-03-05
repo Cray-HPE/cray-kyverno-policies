@@ -1,4 +1,14 @@
 ---
+exceptions:
+  # Specifies the namespace in which all PolicyExceptions are created. By default, it is set to the 'kyverno' namespace.
+  namespace: kyverno
+
+  # podSecurity policy specifications to be used for exceptions
+  podSecurity:
+    baseline:
+      policyName: podsecurity-subrule-baseline
+      ruleName: baseline
+
 checkImagePolicy:
   validationFailureAction: Audit
   background: true
