@@ -3,12 +3,12 @@ apiVersion: kyverno.io/v2
 kind: PolicyException
 metadata:
   name: cray-sysmgmt-health-grok-exporter
-  namespace: kyverno
+  namespace: {{ .Values.exceptions.namespace }}
 spec:
   exceptions:
-  - policyName: podsecurity-subrule-baseline
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
     ruleNames:
-    - baseline
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
     - autogen-baseline
   match:
     any:
@@ -30,12 +30,12 @@ apiVersion: kyverno.io/v2
 kind: PolicyException
 metadata:
   name: cray-sysmgmt-health-node-exporter-smartmon
-  namespace: kyverno
+  namespace: {{ .Values.exceptions.namespace }}
 spec:
   exceptions:
-  - policyName: podsecurity-subrule-baseline
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
     ruleNames:
-    - baseline
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
     - autogen-baseline
   match:
     any:
@@ -64,12 +64,12 @@ apiVersion: kyverno.io/v2
 kind: PolicyException
 metadata:
   name: cray-sysmgmt-health-node-exporter-iscsi
-  namespace: kyverno
+  namespace: {{ .Values.exceptions.namespace }}
 spec:
   exceptions:
-  - policyName: podsecurity-subrule-baseline
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
     ruleNames:
-    - baseline
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
     - autogen-baseline
   match:
     any:
@@ -93,12 +93,12 @@ apiVersion: kyverno.io/v2
 kind: PolicyException
 metadata:
   name: cray-sysmgmt-health-prometheus-node-exporter
-  namespace: kyverno
+  namespace: {{ .Values.exceptions.namespace }}
 spec:
   exceptions:
-  - policyName: podsecurity-subrule-baseline
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
     ruleNames:
-    - baseline
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
     - autogen-baseline
   match:
     any:
@@ -116,7 +116,6 @@ spec:
       values:
         - /proc
         - /sys
-        - /
         - /var/run/dbus/system_bus_socket
         - /var/lib/containerd
         - /var/lib/kubelet
@@ -135,29 +134,29 @@ spec:
       restrictedField: spec.containers[*].ports[*].hostPort
       values:
         - "9100"
-    - controlName: AppArmor
-      restrictedField: spec.containers[*].securityContext.appArmorProfile.type
-      values:
-        - Unconfined
-    - controlName: AppArmor
-      restrictedField: metadata.annotations["container.apparmor.security.beta.kubernetes.io/*"]
-      values:
-        - unconfined
-    - controlName: AppArmor
-      restrictedField: metadata.annotations["container.apparmor.security.beta.kubernetes.io/node-exporter"]
-      values:
-        - unconfined
+#    - controlName: AppArmor
+#      restrictedField: spec.containers[*].securityContext.appArmorProfile.type
+#      values:
+#        - Unconfined
+#    - controlName: AppArmor
+#      restrictedField: metadata.annotations["container.apparmor.security.beta.kubernetes.io/*"]
+#      values:
+#        - unconfined
+#    - controlName: AppArmor
+#      restrictedField: metadata.annotations["container.apparmor.security.beta.kubernetes.io/node-exporter"]
+#      values:
+#        - unconfined
 ---
 apiVersion: kyverno.io/v2
 kind: PolicyException
 metadata:
   name: cray-sysmgmt-health-redfish-cron
-  namespace: kyverno
+  namespace: {{ .Values.exceptions.namespace }}
 spec:
   exceptions:
-  - policyName: podsecurity-subrule-baseline
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
     ruleNames:
-    - baseline
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
     - autogen-baseline
     - autogen-cronjob-baseline
   match:
