@@ -116,6 +116,7 @@ spec:
       values:
         - /proc
         - /sys
+        - /
         - /var/run/dbus/system_bus_socket
         - /var/lib/containerd
         - /var/lib/kubelet
@@ -136,6 +137,8 @@ spec:
         - "9100"
 #    - controlName: AppArmor
 #      restrictedField: spec.containers[*].securityContext.appArmorProfile.type
+#      images:
+#        - "*/prometheus/node-exporter*"
 #      values:
 #        - Unconfined
 #    - controlName: AppArmor
