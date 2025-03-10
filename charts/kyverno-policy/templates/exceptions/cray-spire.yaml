@@ -1,0 +1,115 @@
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: cray-spire-agent
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        - DaemonSet
+        namespaces:
+        - spire
+        names:
+        - cray-spire-agent*
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /run/cray-spire/sockets
+    - controlName: Host Namespaces
+      restrictedField: spec.hostNetwork
+      values:
+        - "true"
+    - controlName: Host Namespaces
+      restrictedField: spec.hostPID
+      values:
+        - "true"
+---
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: cray-spire-jwks
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        - Deployment
+        namespaces:
+        - spire
+        names:
+        - cray-spire-jwks*
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /run/cray-spire/sockets
+---
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: cray-spire-server
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        - StatefulSet
+        namespaces:
+        - spire
+        names:
+        - cray-spire-server*
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /run/cray-spire/sockets/shared
+---
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: request-ncn-join-token
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        - DaemonSet
+        namespaces:
+        - spire
+        names:
+        - request-ncn-join-token*
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /var/lib/spire/conf

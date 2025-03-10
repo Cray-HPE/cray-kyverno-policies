@@ -1,0 +1,98 @@
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: ceph-provisioner
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        - Deployment
+        namespaces:
+        - ceph-cephfs
+        - ceph-rbd
+        names:
+        - cray-ceph-csi-cephfs-provisioner*
+        - cray-ceph-csi-rbd-provisioner*
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /sys
+        - /lib/modules
+        - /dev
+---
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: ceph-nodeplugin
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        - DaemonSet
+        namespaces:
+        - ceph-cephfs
+        - ceph-rbd
+        names:
+        - cray-ceph-csi-cephfs-nodeplugin*
+        - cray-ceph-csi-rbd-nodeplugin*
+  podSecurity:
+    - controlName: Privileged Containers
+      images:
+        - "*/quay.io/cephcsi/cephcsi:*"
+        - "*/k8s.gcr.io/sig-storage/csi-node-driver-registrar:*"
+      restrictedField: spec.containers[*].securityContext.privileged
+      values:
+        - "true"
+    - controlName: Capabilities
+      images:
+        - "*/quay.io/cephcsi/cephcsi:*"
+      restrictedField: spec.containers[*].securityContext.capabilities.add
+      values:
+        - SYS_ADMIN
+    - controlName: Host Namespaces
+      restrictedField: spec.hostNetwork
+      values:
+        - "true"
+    - controlName: Host Namespaces
+      restrictedField: spec.hostPID
+      values:
+        - "true"
+    - controlName: "Host Ports"
+      images:
+        - "*/quay.io/cephcsi/cephcsi:*"
+      restrictedField: spec.containers[*].ports[*].hostPort
+      values:
+        - "8080" # cray-ceph-csi-rbd-nodeplugin*
+        - "8081" # cray-ceph-csi-cephfs-nodeplugin*
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /dev
+        - /etc/selinux
+        - /lib/modules
+        - /run/mount
+        - /sys
+        - /var/lib/kubelet/plugins
+        - /var/lib/kubelet/plugins/cephfs.csi.ceph.com
+        - /var/lib/kubelet/plugins/cephfs.csi.ceph.com/mountinfo
+        - /var/lib/kubelet/plugins/rbd.csi.ceph.com
+        - /var/lib/kubelet/plugins_registry
+        - /var/lib/kubelet/pods
+        - /var/log/ceph
