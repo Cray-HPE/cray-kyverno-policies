@@ -9,7 +9,7 @@ spec:
   - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
     ruleNames:
     - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
-    - autogen-baseline
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
   match:
     any:
     - resources:
@@ -36,7 +36,7 @@ spec:
   - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
     ruleNames:
     - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
-    - autogen-baseline
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
   match:
     any:
     - resources:
@@ -70,7 +70,7 @@ spec:
   - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
     ruleNames:
     - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
-    - autogen-baseline
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
   match:
     any:
     - resources:
@@ -99,7 +99,7 @@ spec:
   - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
     ruleNames:
     - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
-    - autogen-baseline
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
   match:
     any:
     - resources:
@@ -135,6 +135,7 @@ spec:
       restrictedField: spec.containers[*].ports[*].hostPort
       values:
         - "9100"
+#    Commenting appArmor exceptions due to a known Kyverno bug          
 #    - controlName: AppArmor
 #      restrictedField: spec.containers[*].securityContext.appArmorProfile.type
 #      images:
@@ -160,8 +161,8 @@ spec:
   - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
     ruleNames:
     - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
-    - autogen-baseline
-    - autogen-cronjob-baseline
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-cronjob-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
   match:
     any:
     - resources:
