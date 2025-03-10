@@ -1,0 +1,41 @@
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: metallb-speaker
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        - DaemonSet
+        namespaces:
+        - metallb-system
+        names:
+        - metallb-speaker*
+  podSecurity:
+    - controlName: Capabilities
+      images:
+        - "*/metallb/speaker*"
+      restrictedField: spec.containers[*].securityContext.capabilities.add
+      values:
+        - NET_RAW
+
+    - controlName: "Host Ports"
+      images:
+        - "*/metallb/speaker*"
+      restrictedField: spec.containers[*].ports[*].hostPort
+      values:
+        - "7472"
+        - "7946"
+
+    - controlName: "Host Namespaces"
+      restrictedField: spec.hostNetwork
+      values:
+        - "true"
