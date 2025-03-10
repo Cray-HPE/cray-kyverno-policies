@@ -1,0 +1,26 @@
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: cray-sls
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Job
+        - Pod
+        namespaces:
+        - services
+        names:
+        - cray-sls-init-load-nameserver-getter*
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /run/netconfig/

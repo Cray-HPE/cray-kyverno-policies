@@ -1,0 +1,33 @@
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: cray-tftp-modprobe
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        - DaemonSet
+        namespaces:
+        - services
+        names:
+        - cray-tftp-modprobe*
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /lib/modules
+
+    - controlName: Privileged Containers
+      images:
+        - "*/csm-docker/stable/cray-tftpd:*"
+      restrictedField: spec.containers[*].securityContext.privileged
+      values:
+        - "true"
