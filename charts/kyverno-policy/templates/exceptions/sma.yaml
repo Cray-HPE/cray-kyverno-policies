@@ -1,0 +1,89 @@
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: sma-fluentbit-collector
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - DaemonSet
+        - Pod
+        namespaces:
+        - sma
+        names:
+        - fluentbit-collector*
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /var/log
+        - /var/lib/docker/containers
+        - /etc/machine-id
+---
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: sma-fluentbit-auditlogs
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - DaemonSet
+        - Pod
+        namespaces:
+        - sma
+        names:
+        - fluentbit-auditlogs*
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /var/log
+        - /var/log/audit
+---
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: sma-opensearch-masters
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - StatefulSet
+        - Pod
+        namespaces:
+        - sma
+        names:
+        - opensearch-masters*
+  podSecurity:
+    - controlName: Privileged Containers
+      images:
+        # Note: The pod has two init containers with this same
+        # image and only one of them needs to be privileged,
+        # but this is the only control we have to select to
+        # which containers the exception applies.
+        - "*opsterio/busybox:*"
+      restrictedField: spec.initContainers[*].securityContext.privileged
+      values:
+        - "true"
