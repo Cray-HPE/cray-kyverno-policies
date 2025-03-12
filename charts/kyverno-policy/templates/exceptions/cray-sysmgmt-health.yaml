@@ -135,7 +135,7 @@ spec:
 #      restrictedField: spec.containers[*].ports[*].hostPort
 #      values:
 #        - "9100"
-#    Commenting appArmor exceptions due to a known Kyverno bug
+#    Exempting pod from entire policy based on pod names till Kyverno bug is fixed for Apparmor
 #    - controlName: AppArmor
 #      restrictedField: spec.containers[*].securityContext.appArmorProfile.type
 #      images:
