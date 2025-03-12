@@ -110,42 +110,38 @@ spec:
         - sysmgmt-health
         names:
         - cray-sysmgmt-health-prometheus-node-exporter*
-  podSecurity:
-    - controlName: HostPath Volumes
-      restrictedField: spec.volumes[*].hostPath
-      values:
-        - /proc
-        - /sys
-        - /
-        - /var/run/dbus/system_bus_socket
-        - /var/lib/containerd
-        - /var/lib/kubelet
-        - /var/lib/node_exporter
-    - controlName: Host Namespaces
-      restrictedField: spec.hostNetwork
-      values:
-        - "true"
-    - controlName: Host Namespaces
-      restrictedField: spec.hostPID
-      values:
-        - "true"
-    - controlName: "Host Ports"
-      images:
-        - "*/prometheus/node-exporter:*"
-      restrictedField: spec.containers[*].ports[*].hostPort
-      values:
-        - "9100"
-#    Commenting appArmor exceptions due to a known Kyverno bug          
+#  podSecurity:
+#    - controlName: HostPath Volumes
+#      restrictedField: spec.volumes[*].hostPath
+#      values:
+#        - /proc
+#        - /sys
+#        - /
+#        - /var/run/dbus/system_bus_socket
+#        - /var/lib/containerd
+#        - /var/lib/kubelet
+#        - /var/lib/node_exporter
+#    - controlName: Host Namespaces
+#      restrictedField: spec.hostNetwork
+#      values:
+#        - "true"
+#    - controlName: Host Namespaces
+#      restrictedField: spec.hostPID
+#      values:
+#        - "true"
+#    - controlName: "Host Ports"
+#      images:
+#        - "*/prometheus/node-exporter:*"
+#      restrictedField: spec.containers[*].ports[*].hostPort
+#      values:
+#        - "9100"
+#    Commenting appArmor exceptions due to a known Kyverno bug
 #    - controlName: AppArmor
 #      restrictedField: spec.containers[*].securityContext.appArmorProfile.type
 #      images:
 #        - "*/prometheus/node-exporter*"
 #      values:
 #        - Unconfined
-#    - controlName: AppArmor
-#      restrictedField: metadata.annotations["container.apparmor.security.beta.kubernetes.io/*"]
-#      values:
-#        - unconfined
 #    - controlName: AppArmor
 #      restrictedField: metadata.annotations["container.apparmor.security.beta.kubernetes.io/node-exporter"]
 #      values:
