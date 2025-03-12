@@ -110,6 +110,7 @@ spec:
         - sysmgmt-health
         names:
         - cray-sysmgmt-health-prometheus-node-exporter*
+#  Exempting pod from entire policy based on pod names till Kyverno bug is fixed for Apparmor
 #  podSecurity:
 #    - controlName: HostPath Volumes
 #      restrictedField: spec.volumes[*].hostPath
@@ -135,7 +136,6 @@ spec:
 #      restrictedField: spec.containers[*].ports[*].hostPort
 #      values:
 #        - "9100"
-#    Exempting pod from entire policy based on pod names till Kyverno bug is fixed for Apparmor
 #    - controlName: AppArmor
 #      restrictedField: spec.containers[*].securityContext.appArmorProfile.type
 #      images:
