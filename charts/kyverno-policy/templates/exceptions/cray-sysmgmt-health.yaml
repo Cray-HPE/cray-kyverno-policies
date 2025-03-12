@@ -1,0 +1,183 @@
+---
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: cray-sysmgmt-health-grok-exporter
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        - Deployment
+        namespaces:
+        - sysmgmt-health
+        names:
+        - cray-sysmgmt-health-grok-exporter*
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /opt/cray/tests/install/logs/grok_exporter
+---
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: cray-sysmgmt-health-node-exporter-smartmon
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        - DaemonSet
+        namespaces:
+        - sysmgmt-health
+        names:
+        - cray-sysmgmt-health-node-exporter-smartmon*
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /var/lib/node_exporter
+        - /dev
+    - controlName: Privileged Containers
+      images:
+        - "*/galexrt/node-exporter-smartmon*"
+      restrictedField: spec.containers[*].securityContext.privileged
+      values:
+        - "true"
+---
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: cray-sysmgmt-health-node-exporter-iscsi
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        - DaemonSet
+        namespaces:
+        - sysmgmt-health
+        names:
+        - cray-sysmgmt-health-node-exporter-iscsi*
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /var/lib/node_exporter
+        - /sys/kernel/config/target/iscsi/
+        - /etc/target/
+---
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: cray-sysmgmt-health-prometheus-node-exporter
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        - DaemonSet
+        namespaces:
+        - sysmgmt-health
+        names:
+        - cray-sysmgmt-health-prometheus-node-exporter*
+#  Exempting pod from entire policy based on pod names till Kyverno bug is fixed for Apparmor
+#  podSecurity:
+#    - controlName: HostPath Volumes
+#      restrictedField: spec.volumes[*].hostPath
+#      values:
+#        - /proc
+#        - /sys
+#        - /
+#        - /var/run/dbus/system_bus_socket
+#        - /var/lib/containerd
+#        - /var/lib/kubelet
+#        - /var/lib/node_exporter
+#    - controlName: Host Namespaces
+#      restrictedField: spec.hostNetwork
+#      values:
+#        - "true"
+#    - controlName: Host Namespaces
+#      restrictedField: spec.hostPID
+#      values:
+#        - "true"
+#    - controlName: "Host Ports"
+#      images:
+#        - "*/prometheus/node-exporter:*"
+#      restrictedField: spec.containers[*].ports[*].hostPort
+#      values:
+#        - "9100"
+#    - controlName: AppArmor
+#      restrictedField: spec.containers[*].securityContext.appArmorProfile.type
+#      images:
+#        - "*/prometheus/node-exporter*"
+#      values:
+#        - Unconfined
+#    - controlName: AppArmor
+#      restrictedField: metadata.annotations["container.apparmor.security.beta.kubernetes.io/node-exporter"]
+#      values:
+#        - unconfined
+---
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: cray-sysmgmt-health-redfish-cron
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-cronjob-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        - Job
+        - CronJob
+        namespaces:
+        - sysmgmt-health
+        names:
+        - cray-sysmgmt-health-redfish-cron*
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /var/lib/node_exporter
+    - controlName: Privileged Containers
+      images:
+        - "*/csm-docker/stable/redfish-exporter:*"
+      restrictedField: spec.containers[*].securityContext.privileged
+      values:
+        - "true"
