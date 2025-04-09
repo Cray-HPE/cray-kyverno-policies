@@ -1,0 +1,74 @@
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: iuf-argo-sat-wrapper
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        names:
+        - automate-*-prepare-images-*-sat-wrapper-*
+        namespaces:
+        - argo
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /etc/cray/upgrade/csm/*
+---
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: iuf-argo-shell-script
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        names:
+        - automate-*-prepare-images-*-shell-script-*
+        namespaces:
+        - argo
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /root/.ssh
+---
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: iuf-argo-sma
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        names:
+        - sma-*-process-media-*
+        namespaces:
+        - argo
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /etc/cray/upgrade/csm
