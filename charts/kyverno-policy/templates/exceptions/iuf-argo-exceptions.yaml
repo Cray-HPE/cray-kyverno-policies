@@ -1,7 +1,7 @@
 apiVersion: kyverno.io/v2
 kind: PolicyException
 metadata:
-  name: iuf-argo-sat-wrapper
+  name: iuf-argo-media-dir-access
   namespace: {{ .Values.exceptions.namespace }}
 spec:
   exceptions:
@@ -14,7 +14,41 @@ spec:
         kinds:
         - Pod
         names:
-        - automate-*-prepare-images-*-sat-wrapper-*
+        - "*-pre-install-check-*-shell-script-*"
+        - "*-deliver-product-*-shell-script-*"
+        - "*-deliver-product-*-echo-message-*"
+        - "*-process-media-*"
+        namespaces:
+        - argo
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /etc/cray/upgrade/csm
+---
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: iuf-argo-media-sub-dir-access
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        names:
+        - "*-deliver-product-*-gitea-upload-content-*"
+        - "*-update-cfs-config-*-sat-wrapper-*"
+        - "*-prepare-images-*-sat-wrapper-*"
+        - "*-deliver-product-*-ims-upload-content-*"
+        - "*-deliver-product-*-nexus-docker-load-template-*"
+        - "*-deliver-product-*-nexus-helm-load-template-*"
+        - "*-deliver-product-*-nexus-rpm-load-template-*"
         namespaces:
         - argo
   podSecurity:
@@ -39,7 +73,8 @@ spec:
         kinds:
         - Pod
         names:
-        - automate-*-prepare-images-*-shell-script-*
+        - "*-prepare-images-*-shell-script-*"
+        - "*-pre-install-check-*-shell-script-*"
         namespaces:
         - argo
   podSecurity:
@@ -51,7 +86,7 @@ spec:
 apiVersion: kyverno.io/v2
 kind: PolicyException
 metadata:
-  name: iuf-argo-sma
+  name: iuf-argo-ca-certs
   namespace: {{ .Values.exceptions.namespace }}
 spec:
   exceptions:
@@ -64,11 +99,13 @@ spec:
         kinds:
         - Pod
         names:
-        - sma-*-process-media-*
+        - "*-pre-install-check-*-shell-script-*"
+        - "*-deliver-product-*-echo-message-*"
+        - "*-deliver-product-*-shell-script-*"
         namespaces:
         - argo
   podSecurity:
     - controlName: HostPath Volumes
       restrictedField: spec.volumes[*].hostPath
       values:
-        - /etc/cray/upgrade/csm
+        - /var/lib/ca-certificates
