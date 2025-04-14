@@ -22,14 +22,26 @@ spec:
   podSecurity:
     - controlName: Capabilities
       images:
-        - "*/cray-ims-utils:*"
+        - "*/cray-ims-kiwi-ng-opensuse-x86_64-builder:*"
       restrictedField: spec.initContainers[*].securityContext.capabilities.add
       values:
         - SYS_ADMIN
     - controlName: Privileged Containers
       images:
-        - "*/cray-ims-utils:*"
+        - "*/cray-ims-kiwi-ng-opensuse-x86_64-builder:*"
       restrictedField: spec.initContainers[*].securityContext.privileged
+      values:
+        - "true"
+    - controlName: Capabilities
+      images:
+        - "*/cray-ims-sshd:*"
+      restrictedField: spec.containers[*].securityContext.capabilities.add
+      values:
+        - SYS_ADMIN
+    - controlName: Privileged Containers
+      images:
+        - "*/cray-ims-sshd:*"
+      restrictedField: spec.containers[*].securityContext.privileged
       values:
         - "true"
 ---
@@ -57,22 +69,22 @@ spec:
   podSecurity:
     - controlName: Capabilities
       images:
-        - "*/cray-ims-kiwi-ng-opensuse-x86_64-builder:*"
+        - "*/cray-ims-utils:*"
       restrictedField: spec.initContainers[*].securityContext.capabilities.add
       values:
         - SYS_ADMIN
+    - controlName: Privileged Containers
+      images:
+        - "*/cray-ims-utils:*"
+      restrictedField: spec.initContainers[*].securityContext.privileged
+      values:
+        - "true"
     - controlName: Capabilities
       images:
         - "*/cray-ims-sshd:*"
       restrictedField: spec.containers[*].securityContext.capabilities.add
       values:
         - SYS_ADMIN
-    - controlName: Privileged Containers
-      images:
-        - "*/cray-ims-kiwi-ng-opensuse-x86_64-builder:*"
-      restrictedField: spec.initContainers[*].securityContext.privileged
-      values:
-        - "true"
     - controlName: Privileged Containers
       images:
         - "*/cray-ims-sshd:*"
