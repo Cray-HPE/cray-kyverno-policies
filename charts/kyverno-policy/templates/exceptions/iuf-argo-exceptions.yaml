@@ -1,0 +1,111 @@
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: iuf-argo-media-dir-access
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        names:
+        - "*-pre-install-check-*-shell-script-*"
+        - "*-deliver-product-*-shell-script-*"
+        - "*-deliver-product-*-echo-message-*"
+        - "*-process-media-*"
+        namespaces:
+        - argo
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /etc/cray/upgrade/csm
+---
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: iuf-argo-media-sub-dir-access
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        names:
+        - "*-deliver-product-*-gitea-upload-content-*"
+        - "*-update-cfs-config-*-sat-wrapper-*"
+        - "*-prepare-images-*-sat-wrapper-*"
+        - "*-deliver-product-*-ims-upload-content-*"
+        - "*-deliver-product-*-nexus-docker-load-template-*"
+        - "*-deliver-product-*-nexus-helm-load-template-*"
+        - "*-deliver-product-*-nexus-rpm-load-template-*"
+        namespaces:
+        - argo
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /etc/cray/upgrade/csm/*
+---
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: iuf-argo-shell-script
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        names:
+        - "*-prepare-images-*-shell-script-*"
+        - "*-pre-install-check-*-shell-script-*"
+        namespaces:
+        - argo
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /root/.ssh
+---
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: iuf-argo-ca-certs
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        names:
+        - "*-pre-install-check-*-shell-script-*"
+        - "*-deliver-product-*-echo-message-*"
+        - "*-deliver-product-*-shell-script-*"
+        namespaces:
+        - argo
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /var/lib/ca-certificates

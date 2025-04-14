@@ -1,15 +1,7 @@
-# Note: Ideally this would be two separate exceptions, but
-# it doesn't appear that wildcards work in the middle of names,
-# so we can't specify something like
-#   names:
-#   - cray-ims-*-create*
-# or
-#   names:
-#   - cray-ims-*-customize*
 apiVersion: kyverno.io/v2
 kind: PolicyException
 metadata:
-  name: cray-ims
+  name: cray-ims-create
   namespace: {{ .Values.exceptions.namespace }}
 spec:
   exceptions:
@@ -26,29 +18,20 @@ spec:
         namespaces:
         - ims
         names:
-        - cray-ims*
+        - cray-ims-*-create*
   podSecurity:
-    # cray-ims-*-create*
-    - controlName: Capabilities
-      images:
-        - "*/cray-ims-utils:*"
-      restrictedField: spec.initContainers[*].securityContext.capabilities.add
-      values:
-        - SYS_ADMIN
-    - controlName: Privileged Containers
-      images:
-        - "*/cray-ims-utils:*"
-      restrictedField: spec.initContainers[*].securityContext.privileged
-      values:
-        - "true"
-
-    # cray-ims-*-customize
     - controlName: Capabilities
       images:
         - "*/cray-ims-kiwi-ng-opensuse-x86_64-builder:*"
       restrictedField: spec.initContainers[*].securityContext.capabilities.add
       values:
         - SYS_ADMIN
+    - controlName: Privileged Containers
+      images:
+        - "*/cray-ims-kiwi-ng-opensuse-x86_64-builder:*"
+      restrictedField: spec.initContainers[*].securityContext.privileged
+      values:
+        - "true"
     - controlName: Capabilities
       images:
         - "*/cray-ims-sshd:*"
@@ -57,10 +40,51 @@ spec:
         - SYS_ADMIN
     - controlName: Privileged Containers
       images:
-        - "*/cray-ims-kiwi-ng-opensuse-x86_64-builder:*"
+        - "*/cray-ims-sshd:*"
+      restrictedField: spec.containers[*].securityContext.privileged
+      values:
+        - "true"
+---
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: cray-ims-customize
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        - Job
+        namespaces:
+        - ims
+        names:
+        - cray-ims-*-customize*
+  podSecurity:
+    - controlName: Capabilities
+      images:
+        - "*/cray-ims-utils:*"
+      restrictedField: spec.initContainers[*].securityContext.capabilities.add
+      values:
+        - SYS_ADMIN
+    - controlName: Privileged Containers
+      images:
+        - "*/cray-ims-utils:*"
       restrictedField: spec.initContainers[*].securityContext.privileged
       values:
         - "true"
+    - controlName: Capabilities
+      images:
+        - "*/cray-ims-sshd:*"
+      restrictedField: spec.containers[*].securityContext.capabilities.add
+      values:
+        - SYS_ADMIN
     - controlName: Privileged Containers
       images:
         - "*/cray-ims-sshd:*"
