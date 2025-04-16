@@ -17,6 +17,7 @@ spec:
         - "*-pre-install-check-*-shell-script-*"
         - "*-deliver-product-*-shell-script-*"
         - "*-deliver-product-*-echo-message-*"
+        - "*-deploy-product-*-shell-script-*"
         - "*-process-media-*"
         namespaces:
         - argo
@@ -49,6 +50,7 @@ spec:
         - "*-deliver-product-*-nexus-docker-load-template-*"
         - "*-deliver-product-*-nexus-helm-load-template-*"
         - "*-deliver-product-*-nexus-rpm-load-template-*"
+        - "*-deliver-product-*-nexus-setup-template-*"
         namespaces:
         - argo
   podSecurity:
@@ -75,6 +77,7 @@ spec:
         names:
         - "*-prepare-images-*-shell-script-*"
         - "*-pre-install-check-*-shell-script-*"
+        - "*-deliver-product-*-shell-script-*"
         namespaces:
         - argo
   podSecurity:
@@ -102,6 +105,7 @@ spec:
         - "*-pre-install-check-*-shell-script-*"
         - "*-deliver-product-*-echo-message-*"
         - "*-deliver-product-*-shell-script-*"
+        - "*-deploy-product-*-shell-script-*"
         namespaces:
         - argo
   podSecurity:
