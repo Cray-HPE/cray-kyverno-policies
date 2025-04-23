@@ -23,7 +23,6 @@
 #
 NAME ?= kyverno-policy
 
-CHART_VERSION ?= $(VERSION)
 IMAGE ?= artifactory.algol60.net/csm-docker/stable/${NAME}
 
 CHARTDIR ?= charts
@@ -42,7 +41,7 @@ COMMA := ,
 
 all: chart
 
-chart: chart-package chart-test
+chart: test package
 
 helm:
 	docker run --rm \
@@ -56,13 +55,15 @@ helm:
 	    $(HELM_IMAGE) \
 	    $(CMD)
 
-chart-package: packages/${NAME}-${CHART_VERSION}.tgz
-
-packages/${NAME}-${CHART_VERSION}.tgz:
+package:
 	CMD="dep up ${CHARTDIR}/${NAME}" $(MAKE) helm
-	CMD="package ${CHARTDIR}/${NAME} -d packages" $(MAKE) helm
+ifdef CHART_VERSIONS
+	CMD="package ${CHARTDIR}/${NAME} --version $(word 1, $(CHART_VERSIONS)) -d packages" $(MAKE) helm
+else
+	CMD="package ${CHARTDIR}/* -d packages" $(MAKE) helm
+endif
 
-chart-test:
+test:
 	CMD="lint ${CHARTDIR}/${NAME}" $(MAKE) helm
 	docker run --rm -v ${PWD}/${CHARTDIR}:/apps ${HELM_UNITTEST_IMAGE} ${NAME}
 	
