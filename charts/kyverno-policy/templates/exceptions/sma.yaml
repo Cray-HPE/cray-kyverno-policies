@@ -58,7 +58,7 @@ spec:
 apiVersion: kyverno.io/v2
 kind: PolicyException
 metadata:
-  name: sma-opensearch-masters
+  name: sma-opensearch
   namespace: {{ .Values.exceptions.namespace }}
 spec:
   exceptions:
@@ -76,10 +76,11 @@ spec:
         - sma
         names:
         - opensearch-masters*
+        - opensearch-bootstrap*
   podSecurity:
     - controlName: Privileged Containers
       images:
-        # Note: The pod has two init containers with this same
+        # Note: Both the pods have two init containers with this same
         # image and only one of them needs to be privileged,
         # but this is the only control we have to select to
         # which containers the exception applies.
