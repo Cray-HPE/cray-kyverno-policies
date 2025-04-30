@@ -1,0 +1,74 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  annotations:
+    pod-policies.kyverno.io/autogen-controllers: none
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      For CSM deployment, mirroring configuration is set into containerd via /etc/containerd/config.toml file.
+      In particular, this comfiguration rewrites images such as artifactory.algol60.net/csm-docker/name:tag
+      to be looked at in a registry named "registry.local" (i.e. instance of Nexus running locally in Kubernetes cluster).
+      This approach is not compatible with Kyverno check-image policy, which verifies image signatures. This policy
+      performs the same action (i.e. prepends "registry.local/" to image name), in a way compatible with Kyverno
+      check-image policy. Note: registry.local starts responding only after Nexus is deployed into Kubernetes cluster.
+      This policy can be deployed only when Nexus is already deployed and populated with content.
+  name: prepend-registry
+spec:
+  admission: true
+  background: true
+  emitWarning: false
+  rules:
+  - match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    mutate:
+      foreach:
+      - list: request.object.spec.containers
+        patchStrategicMerge:
+          spec:
+            containers:
+            - image: '{{ "{{" }} images.containers."{{ "{{" }} element.name {{ "}}" }}".registry != ''registry.local''
+                && ''registry.local/'' || '''' {{ "}}" }}{{ "{{" }} regex_replace_all(''^dtr.dev.cray.com/'',
+                ''{{ "{{" }} regex_replace_all(''^docker.io/'', ''{{ "{{" }}element.image{{ "}}" }}'', '''')
+                {{ "}}" }}'', '''') {{ "}}" }}'
+              name: "{{ "{{" }} element.name {{ "}}" }}"
+    name: prepend-registry-containers
+    preconditions:
+      all:
+      - key: "{{ "{{" }} request.operation || 'BACKGROUND' {{ "}}" }}"
+        operator: AnyIn
+        value:
+        - CREATE
+        - UPDATE
+    skipBackgroundRequests: true
+  - match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    mutate:
+      foreach:
+      - list: request.object.spec.initContainers
+        patchStrategicMerge:
+          spec:
+            initContainers:
+            - image: '{{ "{{" }} images.initContainers."{{ "{{" }} element.name {{ "}}" }}".registry != ''registry.local''
+                && ''registry.local/'' || '''' {{ "}}" }}{{ "{{" }} regex_replace_all(''^dtr.dev.cray.com/'',
+                ''{{ "{{" }} regex_replace_all(''^docker.io/'', ''{{ "{{" }}element.image{{ "}}" }}'', '''')
+                {{ "}}" }}'', '''') {{ "}}" }}'
+              name: "{{ "{{" }} element.name {{ "}}" }}"
+    name: prepend-registry-initcontainers
+    preconditions:
+      all:
+      - key: "{{ "{{" }} request.operation || 'BACKGROUND' {{ "}}" }}"
+        operator: AnyIn
+        value:
+        - CREATE
+        - UPDATE
+      - key: '{{ "{{" }} request.object.spec.initContainers[] || '''' | length(@) {{ "}}" }}'
+        operator: GreaterThanOrEquals
+        value: 1
+    skipBackgroundRequests: true
+  validationFailureAction: Audit

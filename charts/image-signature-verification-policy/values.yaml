@@ -1,0 +1,50 @@
+---
+checkImagePolicy:
+  validationFailureAction: Audit
+  background: true
+  webhookTimeoutSeconds: 30
+  failurePolicy: Fail
+  #
+  # Image validation rules default to an empty list, and
+  # supposed to be overridden via customizations. Typical set of rules:
+  #
+  # rules:
+  #   - name: check-image
+  #     exclude:
+  #       any:
+  #       - resources:
+  #           names:
+  #           - sample-name
+  #           namespaces:
+  #           - sample-ns
+  #     match:
+  #       any:
+  #       - resources:
+  #           kinds:
+  #           - Pod
+  #           namespaces:
+  #           - '*'
+  #     verifyImages:
+  #     - imageReferences:
+  #       - '*'
+  #       repository: registry.local
+  #       mutateDigest: false
+  #       required: true
+  #       verifyDigest: false
+  #       attestors:
+  #       - count: 1
+  #         entries:
+  #         - keys:
+  #             signatureAlgorithm: sha256
+  #             publicKeys: |-
+  #               -----BEGIN PUBLIC KEY-----
+  #               ...
+  #               -----END PUBLIC KEY-----
+  #               -----BEGIN PUBLIC KEY-----
+  #               ...
+  #               -----END PUBLIC KEY-----
+  #
+  # Documentaion and samples can be found at:
+  # https://kyverno.io/docs/writing-policies/verify-images/sigstore/.
+  #
+  rules: []

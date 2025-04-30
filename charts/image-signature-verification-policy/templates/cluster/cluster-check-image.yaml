@@ -1,0 +1,16 @@
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  annotations:
+    policies.kyverno.io/title: Verify Cosign image signatures against provided public key
+    pod-policies.kyverno.io/autogen-controllers: none
+    policies.kyverno.io/description: >-
+      Verify Cosign image signatures against provided public key(s).
+  name: check-image
+spec:
+  validationFailureAction: {{ .Values.checkImagePolicy.validationFailureAction }}
+  background: {{ .Values.checkImagePolicy.background }}
+  webhookTimeoutSeconds: {{ .Values.checkImagePolicy.webhookTimeoutSeconds }}
+  failurePolicy: {{ .Values.checkImagePolicy.failurePolicy }}
+  rules: {{ .Values.checkImagePolicy.rules | toYaml | nindent 4 }}

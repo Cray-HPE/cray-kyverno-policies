@@ -1,0 +1,28 @@
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: check-image-exceptions
+  namespace: kyverno
+spec:
+  exceptions:
+  - policyName: check-image
+    ruleNames:
+    - check-image
+  match:
+    any:
+    - resources:
+        names:
+        - munge-vault-loader-*
+        namespaces:
+        - services
+    - resources:
+        kinds:
+        - Pod
+        names:
+        - pbs-*
+        - slurm-backup
+        - slurmctld-*
+        - slurmdb-*
+        - slurmdbd-*
+        namespaces:
+        - user

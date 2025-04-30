@@ -1,0 +1,26 @@
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: prepend-registry-exceptions
+  namespace: kyverno
+spec:
+  exceptions:
+  - policyName: prepend-registry
+    ruleNames:
+    - prepend-registry-containers
+    - prepend-registry-initcontainers
+  match:
+    any:
+    - resources:
+        names:
+        - '*kea*'
+        - '*postgres*'
+        - '*nexus*'
+    - resources:
+        selector:
+          matchLabels:
+            spilo-role: '*'
+    - resources:
+        selector:
+          matchLabels:
+            prepend-registry: disable
