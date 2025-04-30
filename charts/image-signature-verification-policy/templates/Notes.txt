@@ -1,5 +1,0 @@
-Thank you for installing {{ .Chart.Name }} {{ .Chart.Version }} 😀
-
-We have installed the kyverno image verification policy to verify the iamge signatures.
-
-Visit https://kyverno.io/policies/ to find more sample policies.
