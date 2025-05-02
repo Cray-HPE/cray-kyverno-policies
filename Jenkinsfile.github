@@ -45,7 +45,7 @@ pipeline {
         stage("Build") {
             environment {
                 CHART_VERSION_kyverno_policy = getChartVersion(name: "kyverno-policy", chartDirectory: "charts", isStable: env.IS_STABLE)
-                CHART_VERSION_image_signature_verification_policy = getChartVersion(name: "image-signature-verification-policy", chartDirectory: "charts", isStable: env.IS_STABLE)
+                CHART_VERSION_image_verification_policy = getChartVersion(name: "image-verification-policy", chartDirectory: "charts", isStable: env.IS_STABLE)
             }
             steps {
                 sh "make"
