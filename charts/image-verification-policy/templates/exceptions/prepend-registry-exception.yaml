@@ -24,5 +24,3 @@ spec:
         selector:
           matchLabels:
             prepend-registry: disable
-
-

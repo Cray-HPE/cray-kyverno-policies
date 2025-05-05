@@ -1,0 +1,15 @@
+apiVersion: v1
+appVersion: v1.13.4
+description: Kyverno image verification policy and its prerequisites are deployed in this chart
+home: https://github.com/Cray-HPE/image-verification
+keywords:
+- kubernetes
+- image verification
+- kyverno
+- image signatures
+kubeVersion: '>=1.25.0-0'
+maintainers:
+- email: security_blr@hpe.com
+  name: Cray-HPE
+name: image-verification-policy
+version: 1.0.0
