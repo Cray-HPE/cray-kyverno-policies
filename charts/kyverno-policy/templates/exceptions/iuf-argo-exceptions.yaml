@@ -18,6 +18,7 @@ spec:
         - "*-deliver-product-*-shell-script-*"
         - "*-deliver-product-*-echo-message-*"
         - "*-deploy-product-*-shell-script-*"
+        - "*-deploy-product-*-echo-message-*"
         - "*-update-vcs-config-*-echo-message-*"
         - "*-process-media-*"
         namespaces:
@@ -80,6 +81,7 @@ spec:
         - "*-process-media-*-shell-script-*"
         - "*-pre-install-check-*-shell-script-*"
         - "*-deliver-product-*-shell-script-*"
+        - "*-deploy-product-*-shell-script-*"
         - "*-management-nodes-rollout-*-shell-script-*"
         - "ncn-lifecycle-rebuild-*-shell-script-*"
         namespaces:
@@ -109,6 +111,7 @@ spec:
         - "*-pre-install-check-*-shell-script-*"
         - "*-deliver-product-*-echo-message-*"
         - "*-deliver-product-*-shell-script-*"
+        - "*-deploy-product-*-echo-message-*"
         - "*-deploy-product-*-shell-script-*"
         - "*-update-vcs-config-*-echo-message-*"
         namespaces:
