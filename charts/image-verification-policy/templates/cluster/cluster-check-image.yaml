@@ -3,8 +3,8 @@ apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
   annotations:
-    pod-policies.kyverno.io/autogen-controllers: none
     policies.kyverno.io/title: Verify Cosign image signatures against provided public key
+    pod-policies.kyverno.io/autogen-controllers: none
     policies.kyverno.io/description: >-
       Verify Cosign image signatures against provided public key(s).
   name: check-image
