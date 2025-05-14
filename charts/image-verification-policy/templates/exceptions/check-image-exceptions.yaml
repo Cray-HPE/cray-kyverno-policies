@@ -1,3 +1,4 @@
+#These exceptions apply to both prepend-registry and check-image policy
 apiVersion: kyverno.io/v2
 kind: PolicyException
 metadata:
@@ -5,24 +6,83 @@ metadata:
   namespace: kyverno
 spec:
   exceptions:
+  - policyName: prepend-registry
+    ruleNames:
+    - prepend-registry-containers
+    - prepend-registry-initcontainers
   - policyName: check-image
     ruleNames:
     - check-image
   match:
     any:
+#sma pods exceptions
     - resources:
         names:
-        - munge-vault-loader-*
+        - '*sma*'
         namespaces:
-        - services
+        - 'services'
+    - resources:
+        namespaces:
+        - 'sma'
+
+#diags pods exceptions
+    - resources:
+        names:
+        - '*badger*'
+        - '*fox*'
+        - '*cvt*'
+
+#slurm pods exceptions
+    - resources:
+        names:
+        - '*slurm*'
+    - resources:
+        namespaces:
+        - 'user'
+    - resources:
+        selector:
+          matchLabels:
+            app.kubernetes.io/part-of: slurm
+
+#pbs pods exceptions
+    - resources:
+        names:
+        - '*pbs*'
+#slingshot pods exceptions
+    - resources:
+        names:
+        - '*slingshot*'
+        - '*sshot*'
+
+#old prepend-registry exceptions
+    - resources:
+        names:
+        - '*kea*'
+        - '*postgres*'
+        - '*nexus*'
+    - resources:
+        selector:
+          matchLabels:
+            spilo-role: '*'
+    - resources:
+        selector:
+          matchLabels:
+            prepend-registry: disable
+
+#old check-image exceptions
+    - resources:
+        names:
+        - 'munge-vault-loader-*'
+        namespaces:
+        - 'services'
     - resources:
         kinds:
         - Pod
         names:
-        - pbs-*
-        - slurm-backup
-        - slurmctld-*
-        - slurmdb-*
-        - slurmdbd-*
+        - 'pbs-*'
+        - 'slurm-backup'
+        - 'slurmctld-*'
+        - 'slurmdb-*'
+        - 'slurmdbd-*'
         namespaces:
         - user
