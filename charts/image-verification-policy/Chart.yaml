@@ -12,4 +12,4 @@ maintainers:
 - email: security_blr@hpe.com
   name: Cray-HPE
 name: image-verification-policy
-version: 1.0.0
+version: 1.0.1
