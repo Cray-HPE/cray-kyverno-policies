@@ -53,6 +53,7 @@ spec:
         - "*-deliver-product-*-nexus-helm-load-template-*"
         - "*-deliver-product-*-nexus-rpm-load-template-*"
         - "*-deliver-product-*-nexus-setup-template-*"
+        - "*-managed-nodes-rollout-*-sat-wrapper-*"
         namespaces:
         - argo
   podSecurity:
@@ -80,6 +81,8 @@ spec:
         - "*-prepare-images-*-shell-script-*"
         - "*-process-media-*-shell-script-*"
         - "*-pre-install-check-*-shell-script-*"
+        - "*-post-install-check-*-shell-script-*"
+        - "*-post-install-service-check-*-shell-script-*"
         - "*-deliver-product-*-shell-script-*"
         - "*-deploy-product-*-shell-script-*"
         - "*-management-nodes-rollout-*-shell-script-*"
