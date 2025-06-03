@@ -117,6 +117,7 @@ spec:
         - "*-deploy-product-*-echo-message-*"
         - "*-deploy-product-*-shell-script-*"
         - "*-update-vcs-config-*-echo-message-*"
+        - "ncn-lifecycle-rebuild-*"
         namespaces:
         - argo
   podSecurity:
@@ -124,3 +125,28 @@ spec:
       restrictedField: spec.volumes[*].hostPath
       values:
         - /var/lib/ca-certificates
+---
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: iuf-argo-bin-dir
+  namespace: {{ .Values.exceptions.namespace }}
+spec:
+  exceptions:
+  - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
+    ruleNames:
+    - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        names:
+        - "ncn-lifecycle-rebuild-*"
+        namespaces:
+        - argo
+  podSecurity:
+    - controlName: HostPath Volumes
+      restrictedField: spec.volumes[*].hostPath
+      values:
+        - /usr/bin
