@@ -28,9 +28,7 @@ spec:
 #diags pods exceptions
     - resources:
         names:
-        - '*badger*'
-        - '*fox*'
-        - '*cvt*'
+        - '*hms-badger-job-api*'
 
 #slurm pods exceptions
     - resources:
