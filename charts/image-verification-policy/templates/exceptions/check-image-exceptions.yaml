@@ -15,36 +15,15 @@ spec:
     - check-image
   match:
     any:
-#sma pods exceptions
-    - resources:
-        names:
-        - '*sma*'
-        namespaces:
-        - 'services'
-    - resources:
-        namespaces:
-        - 'sma'
-
 #diags pods exceptions
     - resources:
         names:
         - '*hms-badger-job-api*'
-
-#slurm pods exceptions
+#uss exceptions
     - resources:
         names:
-        - '*slurm*'
-    - resources:
-        namespaces:
-        - 'user'
-    - resources:
-        selector:
-          matchLabels:
-            app.kubernetes.io/part-of: slurm
-
-#pbs pods exceptions
-    - resources:
-        names:
+        - '*slurmctld*'
+        - '*slurmdbd*'
         - '*pbs*'
 #slingshot pods exceptions
     - resources:
@@ -67,20 +46,3 @@ spec:
           matchLabels:
             prepend-registry: disable
 
-#old check-image exceptions
-    - resources:
-        names:
-        - 'munge-vault-loader-*'
-        namespaces:
-        - 'services'
-    - resources:
-        kinds:
-        - Pod
-        names:
-        - 'pbs-*'
-        - 'slurm-backup'
-        - 'slurmctld-*'
-        - 'slurmdb-*'
-        - 'slurmdbd-*'
-        namespaces:
-        - user
