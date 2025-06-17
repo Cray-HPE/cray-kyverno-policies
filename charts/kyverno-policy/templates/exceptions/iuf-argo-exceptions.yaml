@@ -20,6 +20,7 @@ spec:
         - "*-deploy-product-*-shell-script-*"
         - "*-deploy-product-*-echo-message-*"
         - "*-update-vcs-config-*-echo-message-*"
+        - "*-management-nodes-rollout-*-shell-script-*"
         - "*-process-media-*"
         namespaces:
         - argo
@@ -117,6 +118,7 @@ spec:
         - "*-deploy-product-*-echo-message-*"
         - "*-deploy-product-*-shell-script-*"
         - "*-update-vcs-config-*-echo-message-*"
+        - "*-management-nodes-rollout-*-shell-script-*"
         - "ncn-lifecycle-rebuild-*"
         namespaces:
         - argo
