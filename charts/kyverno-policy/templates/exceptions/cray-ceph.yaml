@@ -56,7 +56,7 @@ spec:
     - controlName: Privileged Containers
       images:
         - "*/quay.io/cephcsi/cephcsi:*"
-        - "*/k8s.gcr.io/sig-storage/csi-node-driver-registrar:*"
+        - "*/registry.k8s.io/sig-storage/csi-node-driver-registrar:*"
       restrictedField: spec.containers[*].securityContext.privileged
       values:
         - "true"
