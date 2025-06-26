@@ -23,8 +23,9 @@ spec:
     - resources:
         names:
         - '*slurmctld*'
-        - '*slurmdbd*'
+        - '*slurmdb*'
         - '*pbs*'
+        - '*munge*'
 #slingshot pods exceptions
     - resources:
         names:
