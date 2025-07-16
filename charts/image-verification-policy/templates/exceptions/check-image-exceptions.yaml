@@ -26,6 +26,7 @@ spec:
         - '*slurmdb*'
         - '*pbs*'
         - '*munge*'
+        - '*slurm-backup*'
 #slingshot pods exceptions
     - resources:
         names:
