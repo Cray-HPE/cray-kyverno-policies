@@ -16,6 +16,7 @@ spec:
         names:
         - "*-pre-install-check-*-shell-script-*"
         - "*-post-install-check-*-echo-message-*"
+        - "*-post-install-service-check-*-echo-message-*"
         - "*-deliver-product-*-shell-script-*"
         - "*-deliver-product-*-echo-message-*"
         - "*-deploy-product-*-shell-script-*"
@@ -115,6 +116,7 @@ spec:
         names:
         - "*-pre-install-check-*-shell-script-*"
         - "*-post-install-check-*-echo-message-*"
+        - "*-post-install-service-check-*-echo-message-*"
         - "*-deliver-product-*-echo-message-*"
         - "*-deliver-product-*-shell-script-*"
         - "*-deploy-product-*-echo-message-*"
