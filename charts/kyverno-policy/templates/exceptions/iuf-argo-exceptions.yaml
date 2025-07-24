@@ -90,6 +90,7 @@ spec:
         - "*-deploy-product-*-shell-script-*"
         - "*-management-nodes-rollout-*-shell-script-*"
         - "ncn-lifecycle-rebuild-*-shell-script-*"
+        - "upgrade-k8s-job-*"
         namespaces:
         - argo
   podSecurity:
