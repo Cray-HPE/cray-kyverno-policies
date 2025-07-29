@@ -75,11 +75,13 @@ spec:
   - policyName: {{ .Values.exceptions.podSecurity.baseline.policyName }}
     ruleNames:
     - {{ .Values.exceptions.podSecurity.baseline.ruleName }}
+    - autogen-{{ .Values.exceptions.podSecurity.baseline.ruleName }}
   match:
     any:
     - resources:
         kinds:
         - Pod
+        - Job
         names:
         - "*-prepare-images-*-shell-script-*"
         - "*-process-media-*-shell-script-*"
