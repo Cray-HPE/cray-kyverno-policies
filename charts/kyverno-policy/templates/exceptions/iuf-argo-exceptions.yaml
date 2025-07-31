@@ -24,6 +24,7 @@ spec:
         - "*-update-vcs-config-*-echo-message-*"
         - "*-management-nodes-rollout-*-shell-script-*"
         - "*-process-media-*"
+        - "iuf-base-auto-workflow-*-shell-script-*"
         namespaces:
         - argo
   podSecurity:
@@ -127,6 +128,7 @@ spec:
         - "*-update-vcs-config-*-echo-message-*"
         - "*-management-nodes-rollout-*-shell-script-*"
         - "ncn-lifecycle-rebuild-*"
+        - "iuf-base-auto-workflow-*-shell-script-*"
         namespaces:
         - argo
   podSecurity:
