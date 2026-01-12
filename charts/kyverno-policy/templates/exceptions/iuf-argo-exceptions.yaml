@@ -23,6 +23,7 @@ spec:
         - "*-deploy-product-*-echo-message-*"
         - "*-update-vcs-config-*-echo-message-*"
         - "*-management-nodes-rollout-*-shell-script-*"
+        - "*-management-nodes-rollout-*-echo-message-*"
         - "*-process-media-*"
         - "iuf-base-auto-workflow-*-shell-script-*"
         namespaces:
@@ -127,6 +128,7 @@ spec:
         - "*-deploy-product-*-shell-script-*"
         - "*-update-vcs-config-*-echo-message-*"
         - "*-management-nodes-rollout-*-shell-script-*"
+        - "*-management-nodes-rollout-*-echo-message-*"
         - "ncn-lifecycle-rebuild-*"
         - "iuf-base-auto-workflow-*-shell-script-*"
         namespaces:
